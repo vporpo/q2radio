@@ -21,6 +21,7 @@
 #include <iomanip> // setfill(), setw()
 #include <iostream>
 #include <libusb-1.0/libusb.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -141,18 +142,13 @@ void printStrV(const char *buf) {
 void printStr(const char *buf) { fprintf(stderr, "%s", buf); }
 
 struct Args {
-  Args(void) {
-    side = -1;
-    stationName = NULL;
-    stationUrl = NULL;
-    list = false;
-    custom = NULL;
-  };
-  int side;
-  char *stationName;
-  char *stationUrl;
-  bool list;
-  char *custom;
+  int side = -1;
+  char *stationName = nullptr;
+  char *stationUrl = nullptr;
+  bool list = false;
+  char *custom = nullptr;
+  char *ssid = nullptr;
+  char *key = nullptr;
 
   void check(void) {
     if (side != -1) {
@@ -187,6 +183,14 @@ struct Args {
       std::cout << custom;
     }
     std::cout << "\n";
+    std::cout << "SSID: \"";
+    if (ssid != nullptr)
+      std::cout << ssid;
+    std::cout << "\"\n";
+    std::cout << "Key: \"";
+    if (key != nullptr)
+      std::cout << key;
+    std::cout << "\"\n";
     std::cout << "--------------\n";
   }
   bool isEmpty(void) { return side == -1; }
@@ -196,6 +200,8 @@ static struct option long_options[] = {
     {"side", required_argument, 0, 's'},
     {"name", required_argument, 0, 'n'},
     {"url", required_argument, 0, 'u'},
+    {"wifi-ssid", required_argument, 0, 'w'},
+    {"wifi-key", required_argument, 0, 'k'},
     {"list", no_argument, 0, 'l'},
     {"custom", required_argument, 0, 'c'},
     // WARNING: Keep "help" last for automatically generated usage() message
@@ -227,6 +233,7 @@ void usage(char **argv) {
   }
   std::cerr << "Example: --side 0 --name \"Rebel State Radio\" --url "
                "\"http://eco.onestreaming.com:8142\"\n";
+  std::cerr << "Example: --wifi-ssid \"<SSID>\" --wifi-key \"<WIFI KEY>\"\n";
   std::cerr << "Example: --custom \"gpre 0 name\":\n";
 }
 
@@ -261,6 +268,12 @@ void parseArgs(int argc, char **argv, Args *args) {
       return;
     case 'c':
       args->custom = (char *)optarg;
+      break;
+    case 'w':
+      args->ssid = (char *)optarg;
+      break;
+    case 'k':
+      args->key = (char *)optarg;
       break;
     default:
       fprintf(stderr, "Bad argument\n");
@@ -350,9 +363,30 @@ int main(int argc, char **argv) {
     printResponse(handle);
     return 0;
   }
+  // Set ssid
+  if (args.ssid) {
+    std::cerr << "Setting SSID to " << args.ssid << "\n";
+    sendStr(handle, args.ssid);
+    std::stringstream ss;
+    ss << "spro 0 ssid " << args.ssid;
+    sendStr(handle, ss.str().c_str());
+  }
+  // Set key
+  if (args.key) {
+    std::cerr << "Setting KEY to " << args.key << "\n";
+    sendStr(handle, args.key);
+    std::stringstream ss;
+    ss << "spro 0 keyval " << args.key;
+    sendStr(handle, ss.str().c_str());
+  }
 
   // Query radio for all sides and print them
   if (args.list || args.side == -1) {
+    // Print ssid.
+    std::cerr << "SSID: ";
+    sendStr(handle, "gpro 0 ssid");
+    printResponse(handle);
+
     printResponse(handle, false); // skip any outstanding output
     for (int side = 0; side != 4; ++side) {
       std::cout << "\nSide: " << side << "\n";

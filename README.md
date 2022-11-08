@@ -22,4 +22,6 @@ $ sudo make install
 ```bash
 $ ./q2radio --list # List the current state of the radio
 $ ./q2radio --side 0 --name "New Radio" --url "http://stream/url"
+$ ./q2radio --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
+
 ```
