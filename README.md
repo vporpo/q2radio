@@ -5,7 +5,7 @@ This is an unofficial Linux client for the Q2 Wi-Fi Internet Radio.
 It uses libusb for the communication with the device in userspace.
 This program provides some basic functionality for loading radio stations to each side of the radio.
 
-A [windows executable](htts://github.com/vporpo/q2radio/releases) can be found in the releases.
+A [windows executable](https://github.com/vporpo/q2radio/releases) can be found in the releases. Please download the zip file containing the windows executable along with the dlls.
 
 ## Requirements
 * libusb: You need to have the libusb developers package (The header file libusb.h is required).
@@ -32,9 +32,10 @@ make -C q2radio/src windows # Don't forget the 'windows' target
 The chances are that you will get an error.
 
 You need to make sure the Q2Radio device uses the WinUSB driver.
-There is a tool for changing the driver called [Zadiag](https://zadig.akeo.ie) (check out the [libusb windows documentation](https://github.com/libusb/libusb/wiki/Windows#how-to-use-libusb-on-windows).
-In the Zadiag tool Q2Radio should show up as a "USB Serial Device" in the drop-down list.
-Switch it to the "WinUSB" driver and try running `q2radio.exe` once again, this time it should work.
+There is a tool for changing the driver called [Zadig](https://zadig.akeo.ie) (check out the [libusb windows documentation](https://github.com/libusb/libusb/wiki/Windows#how-to-use-libusb-on-windows).
+In the Zadig tool click on Options > List All Devices. Then Q2Radio should show up as a "USB Serial Device" in the drop-down list.
+Switch it to the "WinUSB" driver by selecting it on the right hand side of the green arrow, and click on the "Replace Driver" button.
+Then try running `q2radio.exe` once again, this time it should work.
 
 ## Run examples:
 ```bash
