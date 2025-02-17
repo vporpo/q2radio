@@ -16,6 +16,8 @@
 // #define DBG(CMD) CMD
 #define DBG(CMD)
 
+static constexpr const char *version = "0.1";
+
 #include <assert.h>
 #include <getopt.h>
 #include <iomanip> // setfill(), setw()
@@ -146,7 +148,7 @@ struct Args {
   char *stationName = nullptr;
   char *stationUrl = nullptr;
   bool list = false;
-  char *custom = nullptr;
+  char *passthru = nullptr;
   char *ssid = nullptr;
   char *key = nullptr;
 
@@ -178,9 +180,9 @@ struct Args {
     }
     std::cout << "\n";
     std::cout << "list: " << list << "\n";
-    std::cout << "Custom: ";
-    if (custom) {
-      std::cout << custom;
+    std::cout << "Passthru: ";
+    if (passthru) {
+      std::cout << passthru;
     }
     std::cout << "\n";
     std::cout << "SSID: \"";
@@ -203,7 +205,7 @@ static struct option long_options[] = {
     {"wifi-ssid", required_argument, 0, 'w'},
     {"wifi-key", required_argument, 0, 'k'},
     {"list", no_argument, 0, 'l'},
-    {"custom", required_argument, 0, 'c'},
+    {"passthru", required_argument, 0, 'c'},
     // WARNING: Keep "help" last for automatically generated usage() message
     {"help", no_argument, 0, 'h'}};
 
@@ -231,10 +233,10 @@ void usage(char **argv) {
     }
     ++i;
   }
-  std::cerr << "Example: --side 0 --name \"Rebel State Radio\" --url "
-               "\"http://eco.onestreaming.com:8142\"\n";
-  std::cerr << "Example: --wifi-ssid \"<SSID>\" --wifi-key \"<WIFI KEY>\"\n";
-  std::cerr << "Example: --custom \"gpre 0 name\":\n";
+  std::cerr << "Example: --side 0 --name 'Rebel State Radio' --url 'http://eco.onestreaming.com:8142'\n";
+  std::cerr << "Example: --wifi-ssid '<SSID>' --wifi-key '<WIFI KEY>'\n";
+  std::cerr << "Example: --list                   (prints the stations on each side of the radio)\n";
+  std::cerr << "Example: --passthru 'gpre 0 name' (passes raw commands directly to the radio - try 'help')\n";
 }
 
 void parseArgs(int argc, char **argv, Args *args) {
@@ -267,7 +269,7 @@ void parseArgs(int argc, char **argv, Args *args) {
       args->list = true;
       return;
     case 'c':
-      args->custom = (char *)optarg;
+      args->passthru = (char *)optarg;
       break;
     case 'w':
       args->ssid = (char *)optarg;
@@ -307,9 +309,9 @@ void printResponse(libusb_device_handle *handle, bool out = true) {
 }
 
 void banner(void) {
-  std::cout << "+--------------- Q2 Radio Setup --------------+\n";
-  std::cout << "|                                             |\n";
   std::cout << "+---------------------------------------------+\n";
+  std::cout << "|                Q2 Radio Setup               |\n";
+  std::cout << "+------------------------------------- v" << version << " --+\n";
 }
 
 int main(int argc, char **argv) {
@@ -319,7 +321,6 @@ int main(int argc, char **argv) {
   args.check();
   // args.dump();
 
-  libusb_device **devs; // list of devices
   libusb_context *ctx = NULL;
   int r;
   if ((r = libusb_init(&ctx)) < 0) {
@@ -327,23 +328,26 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  libusb_set_debug(ctx, 3);
+  libusb_set_debug(ctx, 1);
+  // libusb_device **devs; // list of devices
   // ssize_t dev_cnt;
   // if ((dev_cnt = libusb_get_device_list(ctx, &devs)) < 0) {
   //   std::cerr << "libusb_get_device_list() error\n";
   //   exit(1);
   // };
   // printAllDevs(devs, dev_cnt);
+  // libusb_free_device_list(devs, 1);
 
   libusb_device_handle *handle;
   int VID = 0x1f2e;
   int PID = 0x000a;
   if ((handle = libusb_open_device_with_vid_pid(ctx, VID, PID)) == NULL) {
-    DBG(fprintf(stderr, "libusb_open_device_with_vid_pid(%04x:%04x)\n", VID,
+    DBG(fprintf(stderr, "FAILED: libusb_open_device_with_vid_pid(%04x:%04x)\n", VID,
                 PID));
+    fprintf(stderr, "ERROR: Could not connect to the device!\n");
+    fprintf(stderr, "Please make sure it is connected and turned on!\n");
     exit(1);
   }
-  // libusb_free_device_list(devs, 1);
 
   if (libusb_kernel_driver_active(handle, 0) == 1) {
     DBG(std::cerr << "Kernel driver active\n");
@@ -353,13 +357,16 @@ int main(int argc, char **argv) {
   }
 
   int IF = 0;
-  if (libusb_claim_interface(handle, IF) < 0) {
+#ifdef WINDOWS
+  IF = 1;
+#endif
+  if (libusb_claim_interface(handle, IF) != 0) {
     std::cerr << "libusb_claim_interface(" << IF << ") failed!\n";
     exit(1);
   }
 
-  if (args.custom) {
-    sendStr(handle, args.custom);
+  if (args.passthru) {
+    sendStr(handle, args.passthru);
     printResponse(handle);
     return 0;
   }
