@@ -5,14 +5,29 @@ This is an unofficial Linux client for the Q2 Wi-Fi Internet Radio.
 It uses libusb for the communication with the device in userspace.
 This program provides some basic functionality for loading radio stations to each side of the radio.
 
-A [windows executable](https://github.com/vporpo/q2radio/releases) can be found in the releases. Please download the zip file containing the windows executable along with the dlls.
+A [windows executable](https://github.com/vporpo/q2radio/releases) can be found in the releases. Please download the `q2radio_win.zip` file containing the windows executable along with the dlls and unzip it.
 
-## Requirements
+## Run examples:
+- Linux:
+```bash
+$ ./q2radio --list # List the current state of the radio
+$ ./q2radio --side 0 --name "New Radio" --url "http://stream/url"
+$ ./q2radio --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
+
+```
+
+- Windows (command prompt)
+```
+C:\the\unzipped\q2radio\path\> q2radio.exe --help
+```
+
+## Build Instructions
+
+### Dependencies
 * libusb: You need to have the libusb developers package (The header file libusb.h is required).
 * A c++ compiler
 * make
 
-## Build Instructions
 ```bash
 $ git clone https://github.com/vporpo/q2radio.git
 $ make -C q2radio/src
@@ -36,10 +51,3 @@ In the Zadig tool click on Options > List All Devices. Then Q2Radio should show 
 Switch it to the "WinUSB" driver by selecting it on the right hand side of the green arrow, and click on the "Replace Driver" button.
 Then try running `q2radio.exe` once again, this time it should work.
 
-## Run examples:
-```bash
-$ ./q2radio --list # List the current state of the radio
-$ ./q2radio --side 0 --name "New Radio" --url "http://stream/url"
-$ ./q2radio --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
-
-```
