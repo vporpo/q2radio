@@ -10,9 +10,12 @@ A [windows executable](https://github.com/vporpo/q2radio/releases) can be found 
 ## Run examples:
 - Linux:
 ```bash
-$ ./q2radio --list # List the current state of the radio
+$ ./q2radio        # List the current state of the radio and exit
+$ ./q2radio --list # List the current state of the radio and exit
 $ ./q2radio --side 0 --name "New Radio" --url "http://stream/url"
 $ ./q2radio --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
+$ ./q2radio --power-on-volume 10   # Set the default volume (1 to 17)
+$ ./q2radio --passthru '<command>' # Pass <command> directly to radio. e.g., --passthru 'help'
 
 ```
 
@@ -51,3 +54,6 @@ In the Zadig tool click on Options > List All Devices. Then Q2Radio should show 
 Switch it to the "WinUSB" driver by selecting it on the right hand side of the green arrow, and click on the "Replace Driver" button.
 Then try running `q2radio.exe` once again, this time it should work.
 
+
+# Changelog
+- v0.2: Adds `--power-on-volume` option for setting up the default volume when the radio powers on

@@ -16,7 +16,7 @@
 // #define DBG(CMD) CMD
 #define DBG(CMD)
 
-static constexpr const char *version = "0.1";
+static constexpr const char *version = "0.2";
 
 #include <assert.h>
 #include <getopt.h>
@@ -151,6 +151,7 @@ struct Args {
   char *passthru = nullptr;
   char *ssid = nullptr;
   char *key = nullptr;
+  int powerOnVolume = -1;
 
   void check(void) {
     if (side != -1) {
@@ -180,6 +181,7 @@ struct Args {
     }
     std::cout << "\n";
     std::cout << "list: " << list << "\n";
+    std::cout << "power-on-volume: " << powerOnVolume << "\n";
     std::cout << "Passthru: ";
     if (passthru) {
       std::cout << passthru;
@@ -195,7 +197,6 @@ struct Args {
     std::cout << "\"\n";
     std::cout << "--------------\n";
   }
-  bool isEmpty(void) { return side == -1; }
 };
 
 static struct option long_options[] = {
@@ -205,6 +206,7 @@ static struct option long_options[] = {
     {"wifi-ssid", required_argument, 0, 'w'},
     {"wifi-key", required_argument, 0, 'k'},
     {"list", no_argument, 0, 'l'},
+    {"power-on-volume", required_argument, 0, 'v'},
     {"passthru", required_argument, 0, 'c'},
     // WARNING: Keep "help" last for automatically generated usage() message
     {"help", no_argument, 0, 'h'}};
@@ -236,6 +238,7 @@ void usage(char **argv) {
   std::cerr << "Example: --side 0 --name 'Rebel State Radio' --url 'http://eco.onestreaming.com:8142'\n";
   std::cerr << "Example: --wifi-ssid '<SSID>' --wifi-key '<WIFI KEY>'\n";
   std::cerr << "Example: --list                   (prints the stations on each side of the radio)\n";
+  std::cerr << "Example: --power-on-volume 40     (Set the dfeault volume when it powers up (1 to 17)\n";
   std::cerr << "Example: --passthru 'gpre 0 name' (passes raw commands directly to the radio - try 'help')\n";
 }
 
@@ -244,7 +247,7 @@ void parseArgs(int argc, char **argv, Args *args) {
   while (1) {
     int option_index = 0;
 
-    int c = getopt_long(argc, argv, "s:n:u:hl", long_options, &option_index);
+    int c = getopt_long(argc, argv, "s:n:u:v:hl", long_options, &option_index);
     if (c == -1) {
       break;
     }
@@ -273,6 +276,9 @@ void parseArgs(int argc, char **argv, Args *args) {
       break;
     case 'w':
       args->ssid = (char *)optarg;
+      break;
+    case 'v':
+      args->powerOnVolume = atoi(optarg);
       break;
     case 'k':
       args->key = (char *)optarg;
@@ -386,12 +392,34 @@ int main(int argc, char **argv) {
     ss << "spro 0 keyval " << args.key;
     sendStr(handle, ss.str().c_str());
   }
+  int vol = args.powerOnVolume;
+  if (vol != -1) {
+    if (vol <= 0 || vol > 17) {
+      std::cerr << "Bad power-on-volume value " << vol << "\n";
+      std::cerr << "Expected 1 to 17\n";
+      exit(1);
+    }
+    std::cout << "\nSetting Power On Volume: " << vol << "\n";
+    char buf[800];
+    static const int RadioMaxVol = 17; // I think 17 is the maximum volume.
+    int raw_volume = std::min(std::max(1, vol), RadioMaxVol);
+    snprintf(buf, 800, "vol %d", raw_volume);
+    sendStr(handle, buf);
+    printResponse(handle);
+    return 0;
+  }
 
+  // NOTE: This should be last!
   // Query radio for all sides and print them
   if (args.list || args.side == -1) {
     // Print ssid.
     std::cerr << "SSID: ";
     sendStr(handle, "gpro 0 ssid");
+    printResponse(handle);
+
+    // Print power-on-volume
+    std::cerr << "Power-on-volume(1 to 17): ";
+    sendStr(handle, "vol");
     printResponse(handle);
 
     printResponse(handle, false); // skip any outstanding output
