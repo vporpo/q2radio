@@ -8,6 +8,7 @@ windows:
 win_dst=q2radio_win
 windows_release: windows
 	mkdir -p $(win_dst)
+	cp q2radio.exe $(win_dst)/
 	zip -r $(win_dst).zip $(win_dst)/
 
 install:
