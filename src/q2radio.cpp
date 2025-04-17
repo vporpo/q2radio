@@ -238,7 +238,7 @@ void usage(char **argv) {
   std::cerr << "Example: --side 0 --name 'Rebel State Radio' --url 'http://eco.onestreaming.com:8142'\n";
   std::cerr << "Example: --wifi-ssid '<SSID>' --wifi-key '<WIFI KEY>'\n";
   std::cerr << "Example: --list                   (prints the stations on each side of the radio)\n";
-  std::cerr << "Example: --power-on-volume 40     (Set the dfeault volume when it powers up (1 to 17)\n";
+  std::cerr << "Example: --power-on-volume 10     (Set the dfeault volume when it powers up (1 to 17)\n";
   std::cerr << "Example: --passthru 'gpre 0 name' (passes raw commands directly to the radio - try 'help')\n";
 }
 
