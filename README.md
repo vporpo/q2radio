@@ -70,6 +70,65 @@ git clone https://github.com/vporpo/q2radio.git
 make -C q2radio/src windows # Don't forget the 'windows' target
 
 
+## Internal commands `--passthru help`
+```
+getmac    - Get mac
+gpre      - get preset
+gpro      - get profile
+spre      - set preset
+spro      - set profile
+scan      - Network scan
+ver       - Version
+fwupgo    - Upgrade
+reboot    - Reboot
+vol       - Default Vol
+standby   - Default secs
+audio     - location
+$len      - Store audio
+fwp       - get/set portal
+setmac    - Set mac
+charge    - Set charge on/off
+bvolts    - Get batt volts
+pc        - PC?
+taudio    - Test tone
+led       - Set LEDs
+hp        - headphones line
+charged   - batt full
+stream    - accel readings
+rssi      - get rssi
+accelrate - accel update
+connect   - connect wifi
+utrim     - get/set trim
+echo      - get/set echo
+wlanstat  - WLAN status
+sn        - get/set serial
+rst       - Fact. default
+ant       - fix
+play_url  - URL
+kick      - current side
+clrerr    - Clr errors
+geterr    - Get errors
+side      - what side
+poke      - DSP poke
+peek      - DSP peek
+filter    - DSP
+mono      - DSP mono
+scale     - DSP scale
+accelcal  - Accel cal
+trigmin   - 
+trigmax   - 
+trigZ     - 
+highvol   - 
+response  - time
+fvals     - show filter
+trigs     - show trigs
+tcp       - show tcp
+buf       - show buffer
+ps        - power save
+sdio      - Enter SDIO menu
+app       - Application menu
+```
+
 # Changelog
 - v0.2: Adds `--power-on-volume` option for setting up the default volume when the radio powers on
 - v0.3: Fixes whitespaces in SSID/key and fixes crash when passing unsupported arguments
