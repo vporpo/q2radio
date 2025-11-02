@@ -379,17 +379,15 @@ int main(int argc, char **argv) {
   // Set ssid
   if (args.ssid) {
     std::cerr << "Setting SSID to " << args.ssid << "\n";
-    sendStr(handle, args.ssid);
     std::stringstream ss;
-    ss << "spro 0 ssid " << args.ssid;
+    ss << "spro 0 ssid \"" << args.ssid << "\"";
     sendStr(handle, ss.str().c_str());
   }
   // Set key
   if (args.key) {
     std::cerr << "Setting KEY to " << args.key << "\n";
-    sendStr(handle, args.key);
     std::stringstream ss;
-    ss << "spro 0 keyval " << args.key;
+    ss << "spro 0 keyval \"" << args.key << "\"";
     sendStr(handle, ss.str().c_str());
   }
   int vol = args.powerOnVolume;
