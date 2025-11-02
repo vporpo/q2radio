@@ -16,7 +16,7 @@
 // #define DBG(CMD) CMD
 #define DBG(CMD)
 
-static constexpr const char *version = "0.2";
+static constexpr const char *version = "0.3";
 
 #include <assert.h>
 #include <getopt.h>
@@ -209,7 +209,9 @@ static struct option long_options[] = {
     {"power-on-volume", required_argument, 0, 'v'},
     {"passthru", required_argument, 0, 'c'},
     // WARNING: Keep "help" last for automatically generated usage() message
-    {"help", no_argument, 0, 'h'}};
+    {"help", no_argument, 0, 'h'},
+    {0, 0, 0, 0}
+};
 
 void usage(char **argv) {
   std::cerr << "Available options:\n";
@@ -284,8 +286,8 @@ void parseArgs(int argc, char **argv, Args *args) {
       args->key = (char *)optarg;
       break;
     default:
-      fprintf(stderr, "Bad argument\n");
-      break;
+      std::cerr << "Use --help for a list of available options!\n";
+      exit(1);
     }
   }
   if (optind < argc) {
@@ -322,6 +324,7 @@ void banner(void) {
 
 int main(int argc, char **argv) {
   banner();
+  std::flush(std::cout);
   Args args;
   parseArgs(argc, argv, &args);
   args.check();
@@ -352,6 +355,10 @@ int main(int argc, char **argv) {
                 PID));
     fprintf(stderr, "ERROR: Could not connect to the device!\n");
     fprintf(stderr, "Please make sure it is connected and turned on!\n");
+#ifdef WINDOWS
+    fprintf(stderr, "* Make sure you have switched to using the WinUSB driver\n");
+    fprintf(stderr, "  using the Zadig tool as explained in the README!\n");
+#endif
     exit(1);
   }
 
@@ -378,14 +385,14 @@ int main(int argc, char **argv) {
   }
   // Set ssid
   if (args.ssid) {
-    std::cerr << "Setting SSID to " << args.ssid << "\n";
+    std::cerr << "Setting SSID to \"" << args.ssid << "\"\n";
     std::stringstream ss;
     ss << "spro 0 ssid \"" << args.ssid << "\"";
     sendStr(handle, ss.str().c_str());
   }
   // Set key
   if (args.key) {
-    std::cerr << "Setting KEY to " << args.key << "\n";
+    std::cerr << "Setting KEY to \"" << args.key << "\"\n";
     std::stringstream ss;
     ss << "spro 0 keyval \"" << args.key << "\"";
     sendStr(handle, ss.str().c_str());
