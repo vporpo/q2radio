@@ -12,13 +12,20 @@ A [windows executable](https://github.com/vporpo/q2radio/releases) can be found 
 ```bash
 $ ./q2radio        # List the current state of the radio and exit
 $ ./q2radio --list # List the current state of the radio and exit
-$ ./q2radio --side 0 --name "New Radio" --url "http://stream/url"
-$ ./q2radio --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
+$ ./q2radio --side 0 --name 'New Radio' --url 'http://stream/url'
+$ ./q2radio --wifi-ssid '<SSID>' --wifi-key '<WIFI KEY>'
 $ ./q2radio --power-on-volume 10   # Set the default volume (1 to 17)
 $ ./q2radio --passthru '<command>' # Pass <command> directly to radio. e.g., --passthru 'help'
-
 ```
-
+- Windows:
+```
+> q2radio.exe        # List the current state of the radio and exit
+> q2radio.exe --list # List the current state of the radio and exit
+> q2radio.exe --side 0 --name "New Radio" --url "http://stream/url"
+> q2radio.exe --wifi-ssid "<SSID>" --wifi-key "<WIFI KEY>"
+> q2radio.exe --power-on-volume 10   # Set the default volume (1 to 17)
+> q2radio.exe --passthru "<command>" # Pass <command> directly to radio. e.g., --passthru "help"
+```
 ### On Windows (command line prompt a.k.a. cmd)
 ```
 C:\the\unzipped\q2radio\path\> q2radio.exe --help
