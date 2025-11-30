@@ -337,7 +337,11 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+#if LIBUSB_API_VERSION >= 0x01000106
+  libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, 1);
+#else
   libusb_set_debug(ctx, 1);
+#endif
   // libusb_device **devs; // list of devices
   // ssize_t dev_cnt;
   // if ((dev_cnt = libusb_get_device_list(ctx, &devs)) < 0) {
